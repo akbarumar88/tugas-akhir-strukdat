@@ -1,0 +1,6 @@
+
+*.depend
+
+obj/Debug/
+
+bin/Debug/
