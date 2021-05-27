@@ -77,6 +77,7 @@ void daftarBarang()
         printf("1. Tambah Barang\n");
         printf("2. Ubah Barang\n");
         printf("3. Hapus Barang\n");
+        printf("4. Cari Barang\n");
         printf("q/Q. Kembali\n\n");
         printf("====================================\n");
         printf("	  DATA BARANG\n");
@@ -101,6 +102,10 @@ void daftarBarang()
 
             case '3':
                 hapus();
+                break;
+
+            case '4':
+                cari();
                 break;
 
             case 'q':
@@ -237,6 +242,64 @@ void hapus()
 
 	getch();
 	system("cls");
+}
+
+void cari()
+{
+    bool exit = false;
+    while (!exit) {
+        system("cls");
+        char keyword[30];
+
+        printf("====================================\n");
+        printf("	CARI DATA BARANG\n");
+        printf("====================================\n");
+        printf("Masukkan kata kunci barang yang ingin dicari : ");
+        fflush(stdin); gets(keyword);
+
+        //printf("%s", keyword);
+        int i = 0;
+        barang hasilCari[100];
+        node *cari = head;
+        // Lanjut sampek tail
+        while(cari != NULL)
+        {
+            // Apakah nama mengandung keyword yg dicari?
+            if(strstr(cari->data.nama, keyword) != NULL) {
+                hasilCari[i] = cari->data;
+                i++;
+            }
+            cari = cari->next;
+        }
+        // Jika data tidak ditemukan
+        if (i == 0) {
+            printf("\nMaaf, data tidak ditemukan!\n");
+        } else {
+            // Tampilkan hasil pencarian
+            printf("Data Berhasil Ditemukan\n");
+            for (int j = 0; j < i; j++) {
+                barang b = hasilCari[j];
+                printf("ID Barang\t: %d\n", b.id);
+                printf("Nama Barang\t: %s\n", b.nama);
+                printf("Harga Barang\t: %.2f\n", b.harga);
+                printf("====================================\n");
+            }
+        }
+        printf("Apakah anda ingin mencari lagi?\n");
+        printf("1. Ya\n");
+        printf("2. Tidak\n");
+        char pilihan = getche();
+        switch(pilihan) {
+            case '1':
+                break;
+
+            case '2':
+            default:
+                exit = true;
+                break;
+        }
+    }
+    system("cls");
 }
 
 void aksiNotFound() {
