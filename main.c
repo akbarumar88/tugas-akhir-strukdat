@@ -37,7 +37,7 @@ int main()
 	printf("       MENU UTAMA\n");
 	printf("====================================\n");
 	printf("1. Daftar Barang\n");
-	printf("Q. Keluar\n");
+	printf("q/Q. Keluar\n");
 	printf("\nMasukkan Pilihan Anda : ");
 	char pilihan = getche();
 
@@ -77,7 +77,7 @@ void daftarBarang()
         printf("1. Tambah Barang\n");
         printf("2. Ubah Barang\n");
         printf("3. Hapus Barang\n");
-        printf("Q. Kembali\n\n");
+        printf("q/Q. Kembali\n\n");
         printf("====================================\n");
         printf("	  DATA BARANG\n");
         printf("====================================\n");
@@ -106,6 +106,10 @@ void daftarBarang()
             case 'q':
             case 'Q':
                 exit = true;
+                break;
+
+            default:
+                aksiNotFound();
                 break;
         }
    	}
@@ -233,4 +237,10 @@ void hapus()
 
 	getch();
 	system("cls");
+}
+
+void aksiNotFound() {
+    printf("\nAksi yang anda inputkan tidak valid.");
+    getch();
+    system("cls");
 }
