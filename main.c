@@ -1,15 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#Halo Frans, Ezra, Dimas
-#Tes lagi gan
-#Tes lagi gan
-#Tes lagi gan
-#Tes lagi gan
-#Tes lagi gan
-#Tes lagi gan
-#Tes lagi gan
-#Tes lagi gan
+
 typedef struct barang{
     int id;
     char nama[50];
