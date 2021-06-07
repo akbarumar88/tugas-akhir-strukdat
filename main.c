@@ -221,16 +221,20 @@ void pemesananBarang()
         printf("4. Konfirmasi Pemesanan\n");
         printf("q/Q. Kembali\n\n");
         // Tampilkan isi Keranjang
-        printf("====================================\n");
+        printf("==============================================\n");
         printf("	  ISI KERANJANG BARANG\n");
-        printf("====================================\n");
+        printf("==============================================\n");
+        double grandTotal=0;
         for (int i=0; i < pesanan->keranjang->top + 1; i++) {
             itemKeranjang b = pesanan->keranjang->item[i];
             printf("ID Detail\t: %d\n", b.id);
             printf("Nama Barang\t: %s\n", b.barang.nama);
-            printf("Harga Barang\t: %.2f\n", b.barang.harga);
-            printf("====================================\n");
+            double total = b.barang.harga * b.jumlah;
+            printf("Total\t\t: %.2f, (%.2f x %d)\n", total, b.barang.harga, b.jumlah);
+            printf("==============================================\n");
+            grandTotal += total;
         }
+        printf("Grand Total : %.2f", grandTotal);
         printf("\n");
         // Tentukan Pilihan
         printf("Aksi : "); char input = getche();
@@ -296,15 +300,29 @@ void tambah_keranjang(Keranjang *keranjang) {
             getch();
             // continue;
         } else {
-            int jumlah;
-            printf("Inputkan Jumlah : "); scanf("%d", &jumlah);
-            // Tambahkan data ke Stack
-            itemKeranjang baru;
-            baru.id = id_keranjang_inc;
-            baru.barang = cari->data;
-            baru.jumlah = jumlah;
-            push(keranjang, baru);
-            id_keranjang_inc++;
+            // Cari apakah sudah ada di keranjang
+            bool exist = false;
+            for (int i =0; i < keranjang->top+1; i++) {
+                itemKeranjang item = keranjang->item[i];
+                if (item.barang.id == cari->data.id) {
+                    // Sudah ada di keranjang
+                    exist = true;
+                    break;
+                }
+            }
+            if (exist) {
+                printf("Barang sudah ada di keranjang, silakan pilih ubah barang atau pilih barang yang lain.\n\n");
+            } else {
+                int jumlah;
+                printf("Inputkan Jumlah : "); scanf("%d", &jumlah);
+                // Tambahkan data ke Stack
+                itemKeranjang baru;
+                baru.id = id_keranjang_inc;
+                baru.barang = cari->data;
+                baru.jumlah = jumlah;
+                push(keranjang, baru);
+                id_keranjang_inc++;
+            }
         }
         printf("Apakah anda ingin menambahkan barang lagi?\n");
         printf("1. Ya\n");
