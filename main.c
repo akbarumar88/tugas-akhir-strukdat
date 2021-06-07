@@ -146,62 +146,6 @@ void daftarBarang()
    	system("cls");
 }
 
-void pemesananBarang()
-{
-    //node *ptr;
-    order *pesanan = malloc(sizeof(order));
-   	bool exit = false;
-   	while (!exit) {
-        system("cls");
-        printf("Aksi :\n");
-        printf("1. Tambah Isi Keranjang\n");
-        printf("2. Ubah Isi Keranjang\n");
-        printf("3. Hapus Isi Keranjang\n");
-        printf("4. Konfirmasi Pemesanan\n");
-        printf("q/Q. Kembali\n\n");
-        printf("====================================\n");
-        printf("	  ISI KERANJANG BARANG\n");
-        printf("====================================\n");
-        /*ptr = head;
-        while (ptr != NULL) {
-             printf("ID Barang\t: %d\n", ptr->data.id);
-             printf("Nama Barang\t: %s\n", ptr->data.nama);
-             printf("Harga Barang\t: %.2f\n", ptr->data.harga);
-             printf("Jumlah Barang\t: %.2f\n", ptr->data.harga);
-             printf("====================================\n");
-             ptr = ptr->next;
-        } */
-        printf("Aksi : "); char input = getche();
-        switch(input) {
-            case '1':
-                tambah_keranjang(pesanan->keranjang);
-                break;
-
-            case '2':
-                //ubah_keranjang();
-                break;
-
-            case '3':
-                //hapus_keranjang();
-                break;
-
-            case '4':
-                //Konfirmasi_pemesanan();
-                break;
-
-            case 'q':
-            case 'Q':
-                exit = true;
-                break;
-
-            default:
-                aksiNotFound();
-                break;
-        }
-   	}
-   	system("cls");
-}
-
 Keranjang* createKeranjang() {
     Keranjang *stack = malloc(sizeof(Keranjang));
     stack->top = -1;
@@ -232,6 +176,64 @@ void pop(Keranjang *s) {
     }
     // Kurangi Top
     s->top--;
+}
+
+void pemesananBarang()
+{
+    //node *ptr;
+    order *pesanan = malloc(sizeof(order));
+    pesanan->keranjang = createKeranjang();
+   	bool exit = false;
+   	while (!exit) {
+        system("cls");
+        printf("Aksi :\n");
+        printf("1. Tambah Isi Keranjang\n");
+        printf("2. Ubah Isi Keranjang\n");
+        printf("3. Hapus Isi Keranjang\n");
+        printf("4. Konfirmasi Pemesanan\n");
+        printf("q/Q. Kembali\n\n");
+        // Tampilkan isi Keranjang
+        printf("====================================\n");
+        printf("	  ISI KERANJANG BARANG\n");
+        printf("====================================\n");
+        for (int i=0; i < pesanan->keranjang->top + 1; i++) {
+            barang b = pesanan->keranjang->item[i];
+            printf("ID Barang\t: %d\n", b.id);
+            printf("Nama Barang\t: %s\n", b.nama);
+            printf("Harga Barang\t: %.2f\n", b.harga);
+            printf("====================================\n");
+        }
+        printf("\n");
+        // Tentukan Pilihan
+        printf("Aksi : "); char input = getche();
+        switch(input) {
+            case '1':
+                tambah_keranjang(pesanan->keranjang);
+                break;
+
+            case '2':
+                //ubah_keranjang();
+                break;
+
+            case '3':
+                //hapus_keranjang();
+                break;
+
+            case '4':
+                //Konfirmasi_pemesanan();
+                break;
+
+            case 'q':
+            case 'Q':
+                exit = true;
+                break;
+
+            default:
+                aksiNotFound();
+                break;
+        }
+   	}
+   	system("cls");
 }
 
 void tambah_keranjang(Keranjang *keranjang) {
@@ -267,7 +269,6 @@ void tambah_keranjang(Keranjang *keranjang) {
             // continue;
         } else {
             // Tambahkan data ke Stack
-            keranjang = createKeranjang();
             push(keranjang, cari->data);
         }
         printf("Apakah anda ingin menambahkan barang lagi?\n");
