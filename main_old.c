@@ -49,10 +49,10 @@ int id_keranjang_inc=1;
 
 void fillDataBarang() {
     barang listBarang[4] = {
-        {id_inc, "Kopi Kapal Aapi", 3500},
-        {++id_inc, "Minyak Bimoli 2L", 15000},
-        {++id_inc, "Gula Aren 2kg", 30000},
-        {++id_inc, "Pepsodent 150gr", 12000}
+        {++id_keranjang_inc, "Kopi Kapal Aapi", 3500},
+        {++id_keranjang_inc, "Minyak Bimoli 2L", 15000},
+        {++id_keranjang_inc, "Gula Aren 2kg", 30000},
+        {++id_keranjang_inc, "Pepsodent 150gr", 12000}
     };
     for (int i = 0; i < 4; i++) {
         barang cur = listBarang[i];
@@ -244,11 +244,11 @@ void pemesananBarang()
                 break;
 
             case '2':
-                ubah_keranjang(pesanan->keranjang);
+                //ubah_keranjang();
                 break;
 
             case '3':
-                hapus_keranjang(pesanan->keranjang);
+                //hapus_keranjang();
                 break;
 
             case '4':
@@ -338,45 +338,6 @@ void tambah_keranjang(Keranjang *keranjang) {
                 break;
         }
     }
-}
-
-void ubah_keranjang(Keranjang *keranjang){
-	system("cls"); 
-	//Pilih Barang
-	int id_cari; 
-	printf("====================================\n");
-    printf("		UBAH KERANJANG\n");
-    printf("====================================\n");
-	printf("Inputkan ID Barang : "); scanf("%d", &id_cari);
-	// Cari apakah sudah ada di keranjang
-	int i;
-	bool exist = false;
-    for (i = 0; i < keranjang->top+1; i++) {
-        itemKeranjang item = keranjang->item[i];
-        if (item.id == id_cari) {
-            // Sudah ada di keranjang
-            exist = true;
-            break;
-        }
-    }
-    if (exist) {
-        //ubah jumlah barang
-		int jumlah;
-        printf("Inputkan Jumlah : "); scanf("%d", &jumlah);
-        // Tambahkan data ke Stack
-        itemKeranjang item = keranjang->item[i];
-        item.jumlah = jumlah;
-        keranjang->item[i] = item;
-        printf ("\nPerubahan Sudah Disimpan !");
-        getch();
-    } else {
-        printf("Data tidak ditemukan!");
-        getch();
-    }
-}
-
-void hapus_keranjang(Keranjang *keranjang){
-	
 }
 
 void tambah()
