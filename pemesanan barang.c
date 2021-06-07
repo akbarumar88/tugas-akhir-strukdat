@@ -15,25 +15,6 @@ struct node {
 	node *prev;
 };
 
-// Stack Keranjang
-#define MAX 50
-typedef struct Keranjang {
-    int top;
-    barang item[MAX];
-} Keranjang;
-
-typedef struct order {
-    char nama[50];
-    Keranjang *keranjang;
-} order;
-
-typedef struct {
-    order item[MAX];
-    int count;
-    int rear;
-    int front;
-} Queue;
-
 node *head = NULL;
 node *tail = NULL;
 node *temp = NULL;
@@ -67,11 +48,11 @@ int main()
 			daftarBarang();
 			goto menu;
             break;
-
+            
         case '2':
         	pemesananBarang();
         	goto menu;
-
+        	
 		case '3':
 			goto menu;
             break;
@@ -149,10 +130,17 @@ void daftarBarang()
 void pemesananBarang()
 {
     //node *ptr;
-    order *pesanan = malloc(sizeof(order));
+    system("cls");
+	/*
+	if(head==NULL){
+   		printf(" Keranjang Kosong \n");
+   		getch();
+   		system("cls");
+   		return;
+   	}
+	*/
    	bool exit = false;
    	while (!exit) {
-        system("cls");
         printf("Aksi :\n");
         printf("1. Tambah Isi Keranjang\n");
         printf("2. Ubah Isi Keranjang\n");
@@ -174,7 +162,7 @@ void pemesananBarang()
         printf("Aksi : "); char input = getche();
         switch(input) {
             case '1':
-                tambah_keranjang(pesanan->keranjang);
+                //tambah_keranjang();
                 break;
 
             case '2':
@@ -200,90 +188,6 @@ void pemesananBarang()
         }
    	}
    	system("cls");
-}
-
-Keranjang* createKeranjang() {
-    Keranjang *stack = malloc(sizeof(Keranjang));
-    stack->top = -1;
-    return stack;
-}
-
-int isFull(Keranjang *s) {
-    return s->top == MAX - 1;
-}
-
-int isEmpty(Keranjang *s) {
-    return s->top == -1;
-}
-
-void push(Keranjang *s, barang item) {
-    if (isFull(s)) {
-        printf("Stack penuh, data tidak dapat disimpan\n");
-        return;
-    }
-    // Push item ke array, sekalian increment top
-    s->item[++s->top] = item;
-}
-
-void pop(Keranjang *s) {
-    if (isEmpty(s)) {
-        printf("Stack kosong, tidak ada yang bisa di-pop\n");
-        return;
-    }
-    // Kurangi Top
-    s->top--;
-}
-
-void tambah_keranjang(Keranjang *keranjang) {
-    // Loop Tambah Keranjang
-    bool selesaiTambah = false;
-    while (!selesaiTambah) {
-        system("cls");
-        // Menampilkan Data Barang
-        printf("====================================\n");
-        printf("	  DATA BARANG\n");
-        printf("====================================\n");
-        node *ptr = head;
-        while (ptr != NULL) {
-            printf("ID Barang\t: %d\n", ptr->data.id);
-            printf("Nama Barang\t: %s\n", ptr->data.nama);
-            printf("Harga Barang\t: %.2f\n", ptr->data.harga);
-            printf("====================================\n");
-            ptr = ptr->next;
-        }
-        // Pilih Barang
-        printf("Inputkan ID Barang : ");
-        int id_cari;
-        scanf("%d", &id_cari);
-        node *cari = head;
-        while(cari != NULL && cari->data.id != id_cari)
-        {
-            cari = cari->next;
-        }
-        // Jika data tidak ditemukan
-        if (cari == NULL) {
-            printf("\nMaaf, data tidak ditemukan!\n");
-            getch();
-            // continue;
-        } else {
-            // Tambahkan data ke Stack
-            keranjang = createKeranjang();
-            push(keranjang, cari->data);
-        }
-        printf("Apakah anda ingin menambahkan barang lagi?\n");
-        printf("1. Ya\n");
-        printf("2. Tidak\n");
-        char pilihan = getche();
-        switch(pilihan) {
-            case '1':
-                break;
-
-            case '2':
-            default:
-                selesaiTambah = true;
-                break;
-        }
-    }
 }
 
 void tambah()
