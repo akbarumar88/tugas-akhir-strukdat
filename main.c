@@ -8,6 +8,12 @@ typedef struct barang{
 	double harga;
 } barang;
 
+typedef struct itemKeranjang {
+    int id;
+    barang barang;
+    int jumlah;
+} itemKeranjang;
+
 typedef struct node node;
 struct node {
     barang data;
@@ -19,7 +25,7 @@ struct node {
 #define MAX 50
 typedef struct Keranjang {
     int top;
-    barang item[MAX];
+    itemKeranjang item[MAX];
 } Keranjang;
 
 typedef struct order {
@@ -39,6 +45,27 @@ node *tail = NULL;
 node *temp = NULL;
 
 int id_inc=1;
+int id_keranjang_inc=1;
+
+void fillDataBarang() {
+    barang listBarang[4] = {
+        {++id_keranjang_inc, "Kopi Kapal Aapi", 3500},
+        {++id_keranjang_inc, "Minyak Bimoli 2L", 15000},
+        {++id_keranjang_inc, "Gula Aren 2kg", 30000},
+        {++id_keranjang_inc, "Pepsodent 150gr", 12000}
+    };
+    for (int i = 0; i < 4; i++) {
+        barang cur = listBarang[i];
+        node *baru = (node *)malloc(sizeof(node));
+        baru->data.id = cur.id;
+        strcpy(baru->data.nama, cur.nama);
+        baru->data.harga = cur.harga;
+        baru->next = NULL;
+        baru->prev = tail;
+        tail->next = baru;
+        tail = baru;
+    }
+}
 
 int main()
 {
@@ -50,6 +77,7 @@ int main()
 	baru->data.harga = 16500;
 	head = tail = baru;
 	id_inc++;
+    fillDataBarang();
 
     menu:
 	printf("====================================\n");
@@ -160,7 +188,7 @@ int isEmpty(Keranjang *s) {
     return s->top == -1;
 }
 
-void push(Keranjang *s, barang item) {
+void push(Keranjang *s, itemKeranjang item) {
     if (isFull(s)) {
         printf("Stack penuh, data tidak dapat disimpan\n");
         return;
@@ -197,10 +225,10 @@ void pemesananBarang()
         printf("	  ISI KERANJANG BARANG\n");
         printf("====================================\n");
         for (int i=0; i < pesanan->keranjang->top + 1; i++) {
-            barang b = pesanan->keranjang->item[i];
-            printf("ID Barang\t: %d\n", b.id);
-            printf("Nama Barang\t: %s\n", b.nama);
-            printf("Harga Barang\t: %.2f\n", b.harga);
+            itemKeranjang b = pesanan->keranjang->item[i];
+            printf("ID Detail\t: %d\n", b.id);
+            printf("Nama Barang\t: %s\n", b.barang.nama);
+            printf("Harga Barang\t: %.2f\n", b.barang.harga);
             printf("====================================\n");
         }
         printf("\n");
@@ -268,8 +296,15 @@ void tambah_keranjang(Keranjang *keranjang) {
             getch();
             // continue;
         } else {
+            int jumlah;
+            printf("Inputkan Jumlah : "); scanf("%d", &jumlah);
             // Tambahkan data ke Stack
-            push(keranjang, cari->data);
+            itemKeranjang baru;
+            baru.id = id_keranjang_inc;
+            baru.barang = cari->data;
+            baru.jumlah = jumlah;
+            push(keranjang, baru);
+            id_keranjang_inc++;
         }
         printf("Apakah anda ingin menambahkan barang lagi?\n");
         printf("1. Ya\n");
