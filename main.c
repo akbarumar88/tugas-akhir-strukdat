@@ -161,6 +161,7 @@ int main()
 
 		case '3':
 			tampilkanDaftarPesanan(daftarPesanan);
+			goto menu;
             break;
 
         case 'q':
@@ -314,9 +315,7 @@ void pemesananBarang(Queue *daftarPesanan)
                 break;
 
             case '4':
-                enqueue(daftarPesanan, *pesanan);
-                printf("\nPesanan berhasil dikonfirmasi.");
-                getch();
+                konfirmasi_pesanan(daftarPesanan, pesanan);
                 exit = true;
                 // konfirmasi_pesanan(pesanan);
                 break;
@@ -537,6 +536,15 @@ void hapus_keranjang(Keranjang *keranjang){
         default:
             break;
     };
+}
+
+void konfirmasi_pesanan(Queue *daftarPesanan, order *pesanan) {
+    char nama[50];
+    printf("\n\n");
+    printf("Nama Pemesan : "); fflush(stdin); gets(pesanan->nama);
+    enqueue(daftarPesanan, *pesanan);
+    printf("Pesanan berhasil dikonfirmasi.");
+    getch();
 }
 
 void tambah()
