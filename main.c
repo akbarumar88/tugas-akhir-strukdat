@@ -322,7 +322,26 @@ void pemesananBarang(Queue *daftarPesanan)
 
             case 'q':
             case 'Q':
-                exit = true;
+                if (!isKeranjangEmpty(pesanan->keranjang)) {
+                	// Keranjang sudah keisi, konfirmasi dulu
+                    printf("\n\nData pesanan akan hilang sebelum dikonfirmasi terlebih dahulu.\n");
+                    printf("Apakah anda yakin ingin kembali ?.\n");
+                    printf("1. Ya\n");
+                    printf("2. Tidak\n");
+                    char pilihan = getche();
+			        switch(pilihan) {
+			            case '1':
+			            	exit = true;
+			                break;
+
+			            case '2':
+			            default:
+			                break;
+			        }
+                } else {
+                	// Keranjang kosong, langsung exit gakpapa
+	                exit = true;
+                }
                 break;
 
             default:
