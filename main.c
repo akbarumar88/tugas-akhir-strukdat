@@ -361,10 +361,34 @@ double getSubtotalPesanan(order pesanan) {
     return subtotal;
 }
 
+void selesai_pesanan(Queue *daftarPesanan) {
+	if (isAntrianEmpty(daftarPesanan)) {
+		printf("\nPesanan kosong, tidak ada yang dapat diselesaikan.\n");
+		getch();
+		return;
+	}
+	printf("\nApakah anda yakin ingin menyelesaikan pesanan?\n");
+    printf("1. Ya\n");
+    printf("2. Tidak\n");
+    char pilihan = getche();
+    switch(pilihan) {
+        case '1':
+        	dequeue(daftarPesanan);
+        	printf("\nPesanan Berhasil diselesaikan.");
+        	getch();
+            break;
+
+        case '2':
+        default:
+            break;
+    }
+}
+
 void tampilkanDaftarPesanan(Queue *daftarPesanan) {
     if (isAntrianEmpty(daftarPesanan)) {
-        printf("Pesanan kosong, tidak ada yang dapat ditampilkan.\n");
+        printf("\nPesanan kosong, tidak ada yang dapat ditampilkan.\n");
         getch();
+        system("cls");
         return;
     }
     bool exit = false;
@@ -398,7 +422,7 @@ void tampilkanDaftarPesanan(Queue *daftarPesanan) {
         printf("Aksi : "); char input = getche();
         switch(input) {
             case '1':
-                //tambah_keranjang(pesanan->keranjang);
+                selesai_pesanan(daftarPesanan);
                 break;
 
             case 'q':
