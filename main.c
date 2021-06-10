@@ -29,6 +29,7 @@ typedef struct Keranjang {
 } Keranjang;
 
 typedef struct order {
+    int id;
     char nama[50];
     Keranjang *keranjang;
 } order;
@@ -98,6 +99,7 @@ node *temp = NULL;
 
 int id_inc=1;
 int id_keranjang_inc=1;
+int id_order_inc=1;
 
 void fillDataBarang() {
     barang listBarang[4] = {
@@ -132,12 +134,16 @@ int main()
 	id_inc++;
     fillDataBarang();
 
+    // Inisialisasi Data Antrian
+    Queue *daftarPesanan = initQueue();
+
     menu:
 	printf("====================================\n");
 	printf("       MENU UTAMA\n");
 	printf("====================================\n");
 	printf("1. Daftar Barang\n");
 	printf("2. Pemesanan Barang\n");
+	printf("3. Daftar Pesanan\n");
 	printf("q/Q. Keluar\n");
 	printf("\nMasukkan Pilihan Anda : ");
 	char pilihan = getche();
@@ -150,11 +156,11 @@ int main()
             break;
 
         case '2':
-        	pemesananBarang();
+        	pemesananBarang(daftarPesanan);
         	goto menu;
 
 		case '3':
-			goto menu;
+			tampilkanDaftarPesanan(daftarPesanan);
             break;
 
         case 'q':
@@ -259,11 +265,14 @@ void pop(Keranjang *s) {
     s->top--;
 }
 
-void pemesananBarang()
+void pemesananBarang(Queue *daftarPesanan)
 {
     //node *ptr;
     order *pesanan = malloc(sizeof(order));
+    pesanan->id = id_order_inc;
     pesanan->keranjang = createKeranjang();
+    id_order_inc++;
+
    	bool exit = false;
    	while (!exit) {
         system("cls");
@@ -305,7 +314,73 @@ void pemesananBarang()
                 break;
 
             case '4':
-                //Konfirmasi_pemesanan();
+                enqueue(daftarPesanan, *pesanan);
+                printf("\nPesanan berhasil dikonfirmasi.");
+                getch();
+                exit = true;
+                // konfirmasi_pesanan(pesanan);
+                break;
+
+            case 'q':
+            case 'Q':
+                exit = true;
+                break;
+
+            default:
+                aksiNotFound();
+                break;
+        }
+   	}
+   	system("cls");
+}
+
+double getSubtotalPesanan(order pesanan) {
+    Keranjang *keranjang = pesanan.keranjang;
+    double subtotal=0;
+    for (int i=0; i < keranjang->top + 1; i++) {
+        subtotal += keranjang->item[i].barang.harga * keranjang->item[i].jumlah;
+    }
+    return subtotal;
+}
+
+void tampilkanDaftarPesanan(Queue *daftarPesanan) {
+    if (isAntrianEmpty(daftarPesanan)) {
+        printf("Pesanan kosong, tidak ada yang dapat ditampilkan.\n");
+        getch();
+        return;
+    }
+    bool exit = false;
+   	while (!exit) {
+        system("cls");
+        printf("Aksi :\n");
+        printf("1. Selesai Pesanan\n");
+        printf("q/Q. Kembali\n\n");
+        // Tampilkan isi Keranjang
+        printf("==============================================\n");
+        printf("	  DAFTAR PESANAN BARANG\n");
+        printf("==============================================\n");
+        double grandTotal=0;
+        int i = daftarPesanan->front;
+        int jumlah = daftarPesanan->count;
+        while (jumlah != 0) {
+            order cur = daftarPesanan->item[i];
+            double subtotal = getSubtotalPesanan(cur);
+            printf("ID Pesanan\t: %d\n", cur.id);
+            printf("Nama Pemesan\t: %s\n", cur.nama);
+            printf("Jumlah Barang\t: %d\n", cur.keranjang->top+1);
+            printf("Subtotal\t: %.2f\n", subtotal);
+            printf("==============================================\n");
+            i = (i + 1) % MAX;
+            jumlah--;
+            grandTotal += subtotal;
+        }
+        printf("Grand Total : %.2f", grandTotal);
+        printf("\n");
+        // Tentukan Pilihan
+        printf("Aksi : "); char input = getche();
+        switch(input) {
+            case '1':
+                //tambah_keranjang(pesanan->keranjang);
                 break;
 
             case 'q':
