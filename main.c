@@ -22,7 +22,7 @@ struct node {
 };
 
 // Stack Keranjang
-#define MAX 50
+#define MAX 2
 typedef struct Keranjang {
     int top;
     itemKeranjang item[MAX];
@@ -39,6 +39,58 @@ typedef struct {
     int rear;
     int front;
 } Queue;
+
+Queue* initQueue() {
+    Queue *q = malloc(sizeof(Queue));
+    q->count = 0;
+    q->front = 0;
+    q->rear = 0;
+    return q;
+}
+
+int isAntrianFull(Queue *q) {
+    return q->count == MAX;
+}
+
+void enqueue(Queue *q, order pesanan) {
+    if (isAntrianFull(q)) {
+        printf("Queue penuh, tidak dapat melakukan enqueue\n");
+        return;
+    }
+    q->item[q->rear] = pesanan;
+    q->rear = (q->rear + 1) % MAX;
+    q->count++;
+}
+
+order dequeue(Queue *q) {
+    order temp;
+    if (isAntrianEmpty(q)) {
+        printf("Queue kosong, tidak dapat melakukan dequeue\n");
+        return;
+    }
+    temp = q->item[q->front];
+    q->front = (q->front+1) % MAX;
+    q->count--;
+    return temp;
+}
+
+int isAntrianEmpty(Queue *q) {
+    return q->count == 0;
+}
+
+void listAntrian(Queue *q) {
+    if (isAntrianEmpty(q)) {
+        printf("Queue kosong, tidak ada yang dapat diprint\n");
+        return;
+    }
+    int i = q->front;
+    int jumlah = q->count;
+    while (jumlah != 0) {
+        printf("%d ", q->item[i]);
+        i = (i + 1) % MAX;
+        jumlah--;
+    }
+}
 
 node *head = NULL;
 node *tail = NULL;
@@ -181,16 +233,16 @@ Keranjang* createKeranjang() {
     return stack;
 }
 
-int isFull(Keranjang *s) {
+int isKeranjangFull(Keranjang *s) {
     return s->top == MAX - 1;
 }
 
-int isEmpty(Keranjang *s) {
+int isKeranjangEmpty(Keranjang *s) {
     return s->top == -1;
 }
 
 void push(Keranjang *s, itemKeranjang item) {
-    if (isFull(s)) {
+    if (isKeranjangFull(s)) {
         printf("Stack penuh, data tidak dapat disimpan\n");
         return;
     }
@@ -199,7 +251,7 @@ void push(Keranjang *s, itemKeranjang item) {
 }
 
 void pop(Keranjang *s) {
-    if (isEmpty(s)) {
+    if (isKeranjangEmpty(s)) {
         printf("Stack kosong, tidak ada yang bisa di-pop\n");
         return;
     }
@@ -218,7 +270,7 @@ void pemesananBarang()
         printf("Aksi :\n");
         printf("1. Tambah Isi Keranjang\n");
         printf("2. Ubah Isi Keranjang\n");
-        printf("3. Hapus Isi Keranjang\n");
+        printf("3. Kurangi Isi Keranjang\n");
         printf("4. Konfirmasi Pemesanan\n");
         printf("q/Q. Kembali\n\n");
         // Tampilkan isi Keranjang
@@ -270,9 +322,21 @@ void pemesananBarang()
 }
 
 void tambah_keranjang(Keranjang *keranjang) {
+    // Cek apakah sudah full?
+    if (isKeranjangFull(keranjang)) {
+        printf("\n\nKeranjang penuh, harap kurangi keranjang terlebih dahulu.");
+        getch();
+        return;
+    }
     // Loop Tambah Keranjang
     bool selesaiTambah = false;
     while (!selesaiTambah) {
+        // Cek apakah sudah full?
+        if (isKeranjangFull(keranjang)) {
+            printf("\nKeranjang sudah penuh, harap kurangi keranjang jika ingin menambah yang lain.");
+            getch();
+            return;
+        }
         system("cls");
         // Menampilkan Data Barang
         printf("====================================\n");
@@ -325,6 +389,7 @@ void tambah_keranjang(Keranjang *keranjang) {
                 id_keranjang_inc++;
             }
         }
+
         printf("Apakah anda ingin menambahkan barang lagi?\n");
         printf("1. Ya\n");
         printf("2. Tidak\n");
@@ -377,13 +442,20 @@ void ubah_keranjang(Keranjang *keranjang){
 }
 
 void hapus_keranjang(Keranjang *keranjang){
-	printf("Apakah anda yakin ingin menghapus isi keranjang ini?\n");
+    if (isKeranjangEmpty(keranjang)) {
+        printf("\n\nKeranjang masih kosong.");
+        getch();
+        return;
+    }
+	printf("\nApakah anda yakin ingin mengurangi isi keranjang ini?\n");
     printf("1. Ya\n");
     printf("2. Tidak\n");
     char pilihan = getche();
     switch(pilihan) {
         case '1':
             pop(keranjang);
+            printf("\n\nIsi keranjang berhasil dikurangi.");
+            getch();
             break;
 
         case '2':
