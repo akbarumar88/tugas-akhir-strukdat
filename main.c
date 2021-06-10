@@ -54,7 +54,8 @@ void fillDataBarang() {
         {++id_inc, "Gula Aren 2kg", 30000},
         {++id_inc, "Pepsodent 150gr", 12000}
     };
-    for (int i = 0; i < 4; i++) {
+    int i;
+    for (i = 0; i < 4; i++) {
         barang cur = listBarang[i];
         node *baru = (node *)malloc(sizeof(node));
         baru->data.id = cur.id;
@@ -341,9 +342,9 @@ void tambah_keranjang(Keranjang *keranjang) {
 }
 
 void ubah_keranjang(Keranjang *keranjang){
-	system("cls"); 
+	system("cls");
 	//Pilih Barang
-	int id_cari; 
+	int id_cari;
 	printf("====================================\n");
     printf("		UBAH KERANJANG\n");
     printf("====================================\n");
@@ -376,7 +377,19 @@ void ubah_keranjang(Keranjang *keranjang){
 }
 
 void hapus_keranjang(Keranjang *keranjang){
-	
+	printf("Apakah anda yakin ingin menghapus isi keranjang ini?\n");
+    printf("1. Ya\n");
+    printf("2. Tidak\n");
+    char pilihan = getche();
+    switch(pilihan) {
+        case '1':
+            pop(keranjang);
+            break;
+
+        case '2':
+        default:
+            break;
+    };
 }
 
 void tambah()
