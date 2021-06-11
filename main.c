@@ -145,7 +145,7 @@ int main()
 	printf("1. Daftar Barang\n");
 	printf("2. Pemesanan Barang\n");
 	printf("3. Daftar Pesanan\n");
-	printf("4. Tree\n");
+	printf("4. Manajemen Versi\n");
 	printf("q/Q. Keluar\n");
 	printf("\nMasukkan Pilihan Anda : ");
 	char pilihan = getche();
@@ -936,13 +936,15 @@ void tree()
 {
     system("cls");
     char nilai[len];
-	Simpul *root = create_simpul("Admin");
+	Simpul *root = create_simpul("1.0.0");
+	root->kanan = create_simpul("1.1.0");
+	root->kanan->kanan = create_simpul("1.1.3");
 
    	bool exit = false;
    	while (!exit) {
         printf("Aksi :\n");
-        printf("1. Tambah Node\n");
-        printf("2. Hapus Node\n");
+        printf("1. Tambah Versi\n");
+        printf("2. Hapus Versi\n");
         printf("3. Tampilkan secara In-Order\n");
         printf("4. Tampilkan secara Pre-Order\n");
         printf("5. Tampilkan secara Post-Order\n");
