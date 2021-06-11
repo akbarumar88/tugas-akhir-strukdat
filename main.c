@@ -795,7 +795,6 @@ typedef struct Simpul
 } Simpul;
 
 Simpul* create_simpul (char nilai[len]){
-
     Simpul* simpul = (Simpul *)malloc(sizeof(Simpul));
     strcpy(simpul->data_simpul, nilai);
     simpul->kanan = NULL;
@@ -828,7 +827,7 @@ Simpul* find_minimum(Simpul *root)
 void tambah_node(Simpul *root, char nilai[len])
 {
     if (strcmp(nilai, root->data_simpul) == 0) {
-        // Jika data sudah ada
+        // Jika data sudah ada di tree
         printf("\nData yang anda inputkan sudah ada di tree.");
         getch();
         return;
@@ -959,7 +958,14 @@ void tree()
 				printf("Masukkan Node Baru : ");
 			    fflush(stdin);
 			    gets(nilai);
-				tambah_node(root, nilai);
+			    if (root == NULL) {
+                    root = create_simpul(nilai);
+                    printf("\nData berhasil ditambahkan");
+                    getch();
+                    system("cls");
+			    } else {
+                    tambah_node(root, nilai);
+			    }
                 break;
 
             case '2':
@@ -979,8 +985,13 @@ void tree()
                 printf("==============================================\n");
 		        printf("	Tampilkan Tree secara In-Order\n");
 		        printf("==============================================\n");
-				deret_inorder(root);
-				getch();
+		        if (root == NULL) {
+                    printf("\nData tidak ditemukan.");
+                    getch();
+		        } else {
+                    deret_inorder(root);
+                    getch();
+		        }
 				system("cls");
                 break;
 
@@ -989,8 +1000,13 @@ void tree()
 				printf("==============================================\n");
 		        printf("	Tampilkan Tree secara Pre-Order\n");
 		        printf("==============================================\n");
-				deret_preorder(root);
-				getch();
+		        if (root == NULL) {
+                    printf("\nData tidak ditemukan.");
+                    getch();
+		        } else {
+                    deret_preorder(root);
+                    getch();
+		        }
 				system("cls");
                 break;
 
@@ -999,8 +1015,13 @@ void tree()
 				printf("==============================================\n");
 		        printf("	Tampilkan Tree secara Post-Order\n");
 		        printf("==============================================\n");
-				deret_postorder(root);
-				getch();
+				if (root == NULL) {
+                    printf("\nData tidak ditemukan.");
+                    getch();
+		        } else {
+                    deret_postorder(root);
+                    getch();
+		        }
 				system("cls");
                 break;
 
