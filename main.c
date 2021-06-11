@@ -905,7 +905,8 @@ Simpul* hapus_node(Simpul *root, char nilai[len])
 void deret_inorder(Simpul *root){
     if (root == NULL)
     {
-	return;
+        //printf("masuk");
+        return;
 	}
     deret_inorder(root->kiri);
     printf("%s ",root->data_simpul);
@@ -915,7 +916,7 @@ void deret_inorder(Simpul *root){
 void deret_preorder(Simpul *root){
     if (root == NULL)
     {
-	return;
+        return;
 	}
     printf("%s ",root->data_simpul);
     deret_preorder(root->kiri);
@@ -969,7 +970,7 @@ void tree()
 				printf("Masukkan Node yang ingin dihapus : ");
 			    fflush(stdin);
 			    gets(nilai);
-				hapus_node(root, nilai);
+				root = hapus_node(root, nilai);
 				system("cls");
                 break;
 
