@@ -22,13 +22,14 @@ struct node {
 };
 
 // Stack Keranjang
-#define MAX 50
+#define MAX 2
 typedef struct Keranjang {
     int top;
     itemKeranjang item[MAX];
 } Keranjang;
 
 typedef struct order {
+    int id;
     char nama[50];
     Keranjang *keranjang;
 } order;
@@ -40,12 +41,65 @@ typedef struct {
     int front;
 } Queue;
 
+Queue* initQueue() {
+    Queue *q = malloc(sizeof(Queue));
+    q->count = 0;
+    q->front = 0;
+    q->rear = 0;
+    return q;
+}
+
+int isAntrianFull(Queue *q) {
+    return q->count == MAX;
+}
+
+void enqueue(Queue *q, order pesanan) {
+    if (isAntrianFull(q)) {
+        printf("Queue penuh, tidak dapat melakukan enqueue\n");
+        return;
+    }
+    q->item[q->rear] = pesanan;
+    q->rear = (q->rear + 1) % MAX;
+    q->count++;
+}
+
+order dequeue(Queue *q) {
+    order temp;
+    if (isAntrianEmpty(q)) {
+        printf("Queue kosong, tidak dapat melakukan dequeue\n");
+        return;
+    }
+    temp = q->item[q->front];
+    q->front = (q->front+1) % MAX;
+    q->count--;
+    return temp;
+}
+
+int isAntrianEmpty(Queue *q) {
+    return q->count == 0;
+}
+
+void listAntrian(Queue *q) {
+    if (isAntrianEmpty(q)) {
+        printf("Queue kosong, tidak ada yang dapat diprint\n");
+        return;
+    }
+    int i = q->front;
+    int jumlah = q->count;
+    while (jumlah != 0) {
+        printf("%d ", q->item[i]);
+        i = (i + 1) % MAX;
+        jumlah--;
+    }
+}
+
 node *head = NULL;
 node *tail = NULL;
 node *temp = NULL;
 
 int id_inc=1;
 int id_keranjang_inc=1;
+int id_order_inc=1;
 
 void fillDataBarang() {
     barang listBarang[4] = {
@@ -54,7 +108,8 @@ void fillDataBarang() {
         {++id_inc, "Gula Aren 2kg", 30000},
         {++id_inc, "Pepsodent 150gr", 12000}
     };
-    for (int i = 0; i < 4; i++) {
+    int i;
+    for (i = 0; i < 4; i++) {
         barang cur = listBarang[i];
         node *baru = (node *)malloc(sizeof(node));
         baru->data.id = cur.id;
@@ -79,12 +134,17 @@ int main()
 	id_inc++;
     fillDataBarang();
 
+    // Inisialisasi Data Antrian
+    Queue *daftarPesanan = initQueue();
+
     menu:
 	printf("====================================\n");
 	printf("       MENU UTAMA\n");
 	printf("====================================\n");
 	printf("1. Daftar Barang\n");
 	printf("2. Pemesanan Barang\n");
+	printf("3. Daftar Pesanan\n");
+	printf("4. Tree\n");
 	printf("q/Q. Keluar\n");
 	printf("\nMasukkan Pilihan Anda : ");
 	char pilihan = getche();
@@ -97,11 +157,17 @@ int main()
             break;
 
         case '2':
-        	pemesananBarang();
+        	pemesananBarang(daftarPesanan);
         	goto menu;
 
 		case '3':
+			tampilkanDaftarPesanan(daftarPesanan);
 			goto menu;
+            break;
+
+        case '4':
+            tree();
+            goto menu;
             break;
 
         case 'q':
@@ -180,16 +246,16 @@ Keranjang* createKeranjang() {
     return stack;
 }
 
-int isFull(Keranjang *s) {
+int isKeranjangFull(Keranjang *s) {
     return s->top == MAX - 1;
 }
 
-int isEmpty(Keranjang *s) {
+int isKeranjangEmpty(Keranjang *s) {
     return s->top == -1;
 }
 
 void push(Keranjang *s, itemKeranjang item) {
-    if (isFull(s)) {
+    if (isKeranjangFull(s)) {
         printf("Stack penuh, data tidak dapat disimpan\n");
         return;
     }
@@ -198,7 +264,7 @@ void push(Keranjang *s, itemKeranjang item) {
 }
 
 void pop(Keranjang *s) {
-    if (isEmpty(s)) {
+    if (isKeranjangEmpty(s)) {
         printf("Stack kosong, tidak ada yang bisa di-pop\n");
         return;
     }
@@ -206,18 +272,21 @@ void pop(Keranjang *s) {
     s->top--;
 }
 
-void pemesananBarang()
+void pemesananBarang(Queue *daftarPesanan)
 {
     //node *ptr;
     order *pesanan = malloc(sizeof(order));
+    pesanan->id = id_order_inc;
     pesanan->keranjang = createKeranjang();
+    id_order_inc++;
+
    	bool exit = false;
    	while (!exit) {
         system("cls");
         printf("Aksi :\n");
         printf("1. Tambah Isi Keranjang\n");
         printf("2. Ubah Isi Keranjang\n");
-        printf("3. Hapus Isi Keranjang\n");
+        printf("3. Kurangi Isi Keranjang\n");
         printf("4. Konfirmasi Pemesanan\n");
         printf("q/Q. Kembali\n\n");
         // Tampilkan isi Keranjang
@@ -252,7 +321,114 @@ void pemesananBarang()
                 break;
 
             case '4':
-                //Konfirmasi_pemesanan();
+                konfirmasi_pesanan(daftarPesanan, pesanan);
+                exit = true;
+                // konfirmasi_pesanan(pesanan);
+                break;
+
+            case 'q':
+            case 'Q':
+                if (!isKeranjangEmpty(pesanan->keranjang)) {
+                	// Keranjang sudah keisi, konfirmasi dulu
+                    printf("\n\nData pesanan akan hilang sebelum dikonfirmasi terlebih dahulu.\n");
+                    printf("Apakah anda yakin ingin kembali ?.\n");
+                    printf("1. Ya\n");
+                    printf("2. Tidak\n");
+                    char pilihan = getche();
+			        switch(pilihan) {
+			            case '1':
+			            	exit = true;
+			                break;
+
+			            case '2':
+			            default:
+			                break;
+			        }
+                } else {
+                	// Keranjang kosong, langsung exit gakpapa
+	                exit = true;
+                }
+                break;
+
+            default:
+                aksiNotFound();
+                break;
+        }
+   	}
+   	system("cls");
+}
+
+double getSubtotalPesanan(order pesanan) {
+    Keranjang *keranjang = pesanan.keranjang;
+    double subtotal=0;
+    for (int i=0; i < keranjang->top + 1; i++) {
+        subtotal += keranjang->item[i].barang.harga * keranjang->item[i].jumlah;
+    }
+    return subtotal;
+}
+
+void selesai_pesanan(Queue *daftarPesanan) {
+	if (isAntrianEmpty(daftarPesanan)) {
+		printf("\nPesanan kosong, tidak ada yang dapat diselesaikan.\n");
+		getch();
+		return;
+	}
+	printf("\nApakah anda yakin ingin menyelesaikan pesanan?\n");
+    printf("1. Ya\n");
+    printf("2. Tidak\n");
+    char pilihan = getche();
+    switch(pilihan) {
+        case '1':
+        	dequeue(daftarPesanan);
+        	printf("\nPesanan Berhasil diselesaikan.");
+        	getch();
+            break;
+
+        case '2':
+        default:
+            break;
+    }
+}
+
+void tampilkanDaftarPesanan(Queue *daftarPesanan) {
+    if (isAntrianEmpty(daftarPesanan)) {
+        printf("\nPesanan kosong, tidak ada yang dapat ditampilkan.\n");
+        getch();
+        system("cls");
+        return;
+    }
+    bool exit = false;
+   	while (!exit) {
+        system("cls");
+        printf("Aksi :\n");
+        printf("1. Selesai Pesanan\n");
+        printf("q/Q. Kembali\n\n");
+        // Tampilkan isi Keranjang
+        printf("==============================================\n");
+        printf("	  DAFTAR PESANAN BARANG\n");
+        printf("==============================================\n");
+        double grandTotal=0;
+        int i = daftarPesanan->front;
+        int jumlah = daftarPesanan->count;
+        while (jumlah != 0) {
+            order cur = daftarPesanan->item[i];
+            double subtotal = getSubtotalPesanan(cur);
+            printf("ID Pesanan\t: %d\n", cur.id);
+            printf("Nama Pemesan\t: %s\n", cur.nama);
+            printf("Jumlah Barang\t: %d\n", cur.keranjang->top+1);
+            printf("Subtotal\t: %.2f\n", subtotal);
+            printf("==============================================\n");
+            i = (i + 1) % MAX;
+            jumlah--;
+            grandTotal += subtotal;
+        }
+        printf("Grand Total : %.2f", grandTotal);
+        printf("\n");
+        // Tentukan Pilihan
+        printf("Aksi : "); char input = getche();
+        switch(input) {
+            case '1':
+                selesai_pesanan(daftarPesanan);
                 break;
 
             case 'q':
@@ -269,9 +445,21 @@ void pemesananBarang()
 }
 
 void tambah_keranjang(Keranjang *keranjang) {
+    // Cek apakah sudah full?
+    if (isKeranjangFull(keranjang)) {
+        printf("\n\nKeranjang penuh, harap kurangi keranjang terlebih dahulu.");
+        getch();
+        return;
+    }
     // Loop Tambah Keranjang
     bool selesaiTambah = false;
     while (!selesaiTambah) {
+        // Cek apakah sudah full?
+        if (isKeranjangFull(keranjang)) {
+            printf("\nKeranjang sudah penuh, harap kurangi keranjang jika ingin menambah yang lain.");
+            getch();
+            return;
+        }
         system("cls");
         // Menampilkan Data Barang
         printf("====================================\n");
@@ -324,6 +512,7 @@ void tambah_keranjang(Keranjang *keranjang) {
                 id_keranjang_inc++;
             }
         }
+
         printf("Apakah anda ingin menambahkan barang lagi?\n");
         printf("1. Ya\n");
         printf("2. Tidak\n");
@@ -341,9 +530,9 @@ void tambah_keranjang(Keranjang *keranjang) {
 }
 
 void ubah_keranjang(Keranjang *keranjang){
-	system("cls"); 
+	system("cls");
 	//Pilih Barang
-	int id_cari; 
+	int id_cari;
 	printf("====================================\n");
     printf("		UBAH KERANJANG\n");
     printf("====================================\n");
@@ -376,7 +565,35 @@ void ubah_keranjang(Keranjang *keranjang){
 }
 
 void hapus_keranjang(Keranjang *keranjang){
-	
+    if (isKeranjangEmpty(keranjang)) {
+        printf("\n\nKeranjang masih kosong.");
+        getch();
+        return;
+    }
+	printf("\nApakah anda yakin ingin mengurangi isi keranjang ini?\n");
+    printf("1. Ya\n");
+    printf("2. Tidak\n");
+    char pilihan = getche();
+    switch(pilihan) {
+        case '1':
+            pop(keranjang);
+            printf("\n\nIsi keranjang berhasil dikurangi.");
+            getch();
+            break;
+
+        case '2':
+        default:
+            break;
+    };
+}
+
+void konfirmasi_pesanan(Queue *daftarPesanan, order *pesanan) {
+    char nama[50];
+    printf("\n\n");
+    printf("Nama Pemesan : "); fflush(stdin); gets(pesanan->nama);
+    enqueue(daftarPesanan, *pesanan);
+    printf("Pesanan berhasil dikonfirmasi.");
+    getch();
 }
 
 void tambah()
@@ -561,6 +778,176 @@ void cari()
 
 void aksiNotFound() {
     printf("\nAksi yang anda inputkan tidak valid.");
+    getch();
+    system("cls");
+}
+
+/*
+* Tree
+*/
+
+#define len 50
+typedef struct Simpul
+{
+    char data_simpul[len];
+    struct Simpul *kiri;
+    struct Simpul *kanan;
+} Simpul;
+
+Simpul* create_simpul (char nilai[len]){
+
+    Simpul* simpul = (Simpul *)malloc(sizeof(Simpul));
+    strcpy(simpul->data_simpul, nilai);
+    simpul->kanan = NULL;
+    simpul->kiri = NULL;
+
+    return simpul;
+}
+
+void insert(Simpul *root, char nilai[len]){
+
+    if(strcmp(nilai, root->data_simpul) > 0){
+        if(root->kanan == NULL){
+            root->kanan = create_simpul(nilai);
+        }
+		else{
+            insert(root->kanan, nilai);
+        }
+    }
+
+    if(strcmp(nilai, root->data_simpul) < 0){
+        if(root->kiri == NULL){
+            root->kiri = create_simpul(nilai);
+        }
+		else{
+            insert(root->kiri, nilai);
+        }
+    }
+}
+
+/*Simpul* tree (char deret_angka[], int ukuran_deret){
+	int i;
+    Simpul *root;
+
+    for(i = 0; i < ukuran_deret; i++){
+        if(i == 0){
+            root = create_simpul(deret_angka[i]);
+            continue;
+        }
+        insert(root, deret_angka[i]);
+    }
+    return root;
+}*/
+
+void deret_inorder(Simpul *root){
+    if (root == NULL)
+    {
+	return;
+	}
+    deret_inorder(root->kiri);
+    printf("%s ",root->data_simpul);
+    deret_inorder(root->kanan);
+}
+
+void deret_preorder(Simpul *root){
+    if (root == NULL)
+    {
+	return;
+	}
+    printf("%s ",root->data_simpul);
+    deret_preorder(root->kiri);
+    deret_preorder(root->kanan);
+}
+
+void deret_postorder(Simpul *root){
+    if (root == NULL)
+	{
+	return;
+	}
+    deret_postorder(root->kiri);
+    deret_postorder(root->kanan);
+    printf("%s ",root->data_simpul);
+}
+
+//fungsi untuk menemukan nilai minimum pada node
+Simpul* find_minimum(Simpul *root)
+{
+    if(root == NULL)
+        return NULL;
+    else if(root->kiri != NULL)
+        return find_minimum(root->kanan);
+    return root;
+}
+
+Simpul* delete(Simpul *root, char nilai[len])
+{
+    //search input yang mau dihapus
+    if(root==NULL)
+        return NULL;
+    if(strcmp(nilai, root->data_simpul) > 0)
+		root->kanan = delete(root->kanan, nilai);
+	else if(strcmp(nilai, root->data_simpul) < 0)
+		root->kiri = delete(root->kiri, nilai);
+	else
+    {
+        //No Child
+        if(root->kiri==NULL && root->kanan==NULL)
+        {
+            free(root);
+            return NULL;
+        }
+
+        //One Child
+        else if(root->kiri==NULL || root->kanan==NULL)
+        {
+            struct Simpul *temp;
+            if(root->kiri==NULL)
+                temp = root->kanan;
+            else
+                temp = root->kiri;
+            free(root);
+            return temp;
+        }
+
+        //Two Child
+        else
+        {
+            struct Simpul *temp = find_minimum(root->kanan);
+            root->data_simpul[len] = temp->data_simpul[len];
+            root->kanan = delete(root->kanan, temp->data_simpul);
+        }
+    }
+    return root;
+}
+
+void tree()
+{
+    system("cls");
+	//int deret_angka[] = { 19, 8, 10, 1, 006, 2, 17, 04, 20, 01 };
+    //int ukuran_deret = sizeof(deret_angka) / sizeof(deret_angka[0]);
+
+    Simpul *root = create_simpul("Admin");
+
+	insert(root, "Ezra");
+	insert(root, "Akbar");
+	insert(root, "Frans");
+	insert(root, "Adit");
+	insert(root, "Test");
+	insert(root, "Coba");
+	insert(root, "Lagi");
+
+	printf("In Order 	: ");
+    deret_inorder(root);
+    printf("\nPre Order 	: ");
+    deret_preorder(root);
+    printf("\nPost Order 	: ");
+    deret_postorder(root);
+
+    root = delete(root, "Lagi");
+    root = delete(root, "Test");
+    root = delete(root, "Coba");
+    printf("\n\nIn Order Setelah Delete Node : ");
+    deret_inorder(root);
     getch();
     system("cls");
 }
