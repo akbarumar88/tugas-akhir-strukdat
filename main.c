@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 typedef struct barang{
     int id;
@@ -785,7 +786,6 @@ void aksiNotFound() {
 /*
 * Tree
 */
-
 #define len 50
 typedef struct Simpul
 {
@@ -804,40 +804,103 @@ Simpul* create_simpul (char nilai[len]){
     return simpul;
 }
 
-void insert(Simpul *root, char nilai[len]){
-
-    if(strcmp(nilai, root->data_simpul) > 0){
-        if(root->kanan == NULL){
-            root->kanan = create_simpul(nilai);
-        }
-		else{
-            insert(root->kanan, nilai);
-        }
-    }
-
-    if(strcmp(nilai, root->data_simpul) < 0){
-        if(root->kiri == NULL){
-            root->kiri = create_simpul(nilai);
-        }
-		else{
-            insert(root->kiri, nilai);
-        }
-    }
+//searching node
+Simpul* search(Simpul *root, char nilai[len])
+{
+    if(root==NULL || root->data_simpul == nilai[len])
+        return root;
+    else if(strcmp(nilai, root->data_simpul) > 0)
+        return search(root->kanan, nilai);
+    else
+        return search(root->kiri, nilai);
 }
 
-/*Simpul* tree (char deret_angka[], int ukuran_deret){
-	int i;
-    Simpul *root;
+//fungsi untuk menemukan nilai minimum pada node
+Simpul* find_minimum(Simpul *root)
+{
+    if(root == NULL)
+        return NULL;
+    else if(root->kiri != NULL)
+        return find_minimum(root->kanan);
+    return root;
+}
 
-    for(i = 0; i < ukuran_deret; i++){
-        if(i == 0){
-            root = create_simpul(deret_angka[i]);
-            continue;
+void tambah_node(Simpul *root, char nilai[len])
+{
+    if (strcmp(nilai, root->data_simpul) == 0) {
+        // Jika data sudah ada
+        printf("\nData yang anda inputkan sudah ada di tree.");
+        getch();
+        return;
+    }
+	if(strcmp(nilai, root->data_simpul) > 0){
+        if(root->kanan == NULL){
+            root->kanan = create_simpul(nilai);
+            printf("\nData berhasil ditambahkan.");
+            getch();
         }
-        insert(root, deret_angka[i]);
+		else{
+            tambah_node(root->kanan, nilai);
+        }
+    }else if(strcmp(nilai, root->data_simpul) < 0){
+        if(root->kiri == NULL){
+            root->kiri = create_simpul(nilai);
+            printf("\nData berhasil ditambahkan.");
+            getch();
+        }
+		else{
+            tambah_node(root->kiri, nilai);
+        }
+    }
+    system("cls");
+}
+
+Simpul* hapus_node(Simpul *root, char nilai[len])
+{
+	//search input yang mau dihapus
+    if(root==NULL) {
+        printf("\nData tidak ditemukan.");
+        getch();
+        return NULL;
+    }
+
+    if(strcmp(nilai, root->data_simpul) > 0)
+		root->kanan = hapus_node(root->kanan, nilai);
+	else if(strcmp(nilai, root->data_simpul) < 0)
+		root->kiri = hapus_node(root->kiri, nilai);
+	else
+    {
+        //No Child
+        if(root->kiri==NULL && root->kanan==NULL)
+        {
+            free(root);
+            printf("\nData berhasil dihapus.");
+            getch();
+            return NULL;
+        }
+        //One Child
+        else if(root->kiri==NULL || root->kanan==NULL)
+        {
+            struct Simpul *temp;
+            if(root->kiri==NULL)
+                temp = root->kanan;
+            else
+                temp = root->kiri;
+            free(root);
+            printf("\nData berhasil dihapus.");
+            getch();
+            return temp;
+        }
+        //Two Child
+        else
+        {
+            struct Simpul *temp = find_minimum(root->kanan);
+            root->data_simpul[len] = temp->data_simpul[len];
+            root->kanan = hapus_node(root->kanan, temp->data_simpul);
+        }
     }
     return root;
-}*/
+}
 
 void deret_inorder(Simpul *root){
     if (root == NULL)
@@ -869,85 +932,86 @@ void deret_postorder(Simpul *root){
     printf("%s ",root->data_simpul);
 }
 
-//fungsi untuk menemukan nilai minimum pada node
-Simpul* find_minimum(Simpul *root)
-{
-    if(root == NULL)
-        return NULL;
-    else if(root->kiri != NULL)
-        return find_minimum(root->kanan);
-    return root;
-}
-
-Simpul* delete(Simpul *root, char nilai[len])
-{
-    //search input yang mau dihapus
-    if(root==NULL)
-        return NULL;
-    if(strcmp(nilai, root->data_simpul) > 0)
-		root->kanan = delete(root->kanan, nilai);
-	else if(strcmp(nilai, root->data_simpul) < 0)
-		root->kiri = delete(root->kiri, nilai);
-	else
-    {
-        //No Child
-        if(root->kiri==NULL && root->kanan==NULL)
-        {
-            free(root);
-            return NULL;
-        }
-
-        //One Child
-        else if(root->kiri==NULL || root->kanan==NULL)
-        {
-            struct Simpul *temp;
-            if(root->kiri==NULL)
-                temp = root->kanan;
-            else
-                temp = root->kiri;
-            free(root);
-            return temp;
-        }
-
-        //Two Child
-        else
-        {
-            struct Simpul *temp = find_minimum(root->kanan);
-            root->data_simpul[len] = temp->data_simpul[len];
-            root->kanan = delete(root->kanan, temp->data_simpul);
-        }
-    }
-    return root;
-}
-
 void tree()
 {
     system("cls");
-	//int deret_angka[] = { 19, 8, 10, 1, 006, 2, 17, 04, 20, 01 };
-    //int ukuran_deret = sizeof(deret_angka) / sizeof(deret_angka[0]);
+    char nilai[len];
+	Simpul *root = create_simpul("Admin");
 
-    Simpul *root = create_simpul("Admin");
+   	bool exit = false;
+   	while (!exit) {
+        printf("Aksi :\n");
+        printf("1. Tambah Node\n");
+        printf("2. Hapus Node\n");
+        printf("3. Tampilkan secara In-Order\n");
+        printf("4. Tampilkan secara Pre-Order\n");
+        printf("5. Tampilkan secara Post-Order\n");
+        printf("q/Q. Kembali\n\n");
 
-	insert(root, "Ezra");
-	insert(root, "Akbar");
-	insert(root, "Frans");
-	insert(root, "Adit");
-	insert(root, "Test");
-	insert(root, "Coba");
-	insert(root, "Lagi");
+        printf("Aksi : "); char input = getche();
+        switch(input) {
+            case '1':
+			    system("cls");
+			    printf("==============================================\n");
+		        printf("		INSERT NODE\n");
+		        printf("==============================================\n");
+				printf("Masukkan Node Baru : ");
+			    fflush(stdin);
+			    gets(nilai);
+				tambah_node(root, nilai);
+                break;
 
-	printf("In Order 	: ");
-    deret_inorder(root);
-    printf("\nPre Order 	: ");
-    deret_preorder(root);
-    printf("\nPost Order 	: ");
-    deret_postorder(root);
+            case '2':
+			    system("cls");
+			    printf("==============================================\n");
+		        printf("		DELETE NODE\n");
+		        printf("==============================================\n");
+				printf("Masukkan Node yang ingin dihapus : ");
+			    fflush(stdin);
+			    gets(nilai);
+				hapus_node(root, nilai);
+				system("cls");
+                break;
 
-    root = delete(root, "Lagi");
-    root = delete(root, "Test");
-    root = delete(root, "Coba");
-    printf("\n\nIn Order Setelah Delete Node : ");
-    deret_inorder(root);
-    getch();
-    system("cls");
+            case '3':
+                system("cls");
+                printf("==============================================\n");
+		        printf("	Tampilkan Tree secara In-Order\n");
+		        printf("==============================================\n");
+				deret_inorder(root);
+				getch();
+				system("cls");
+                break;
+
+            case '4':
+                system("cls");
+				printf("==============================================\n");
+		        printf("	Tampilkan Tree secara Pre-Order\n");
+		        printf("==============================================\n");
+				deret_preorder(root);
+				getch();
+				system("cls");
+                break;
+
+			case '5':
+                system("cls");
+				printf("==============================================\n");
+		        printf("	Tampilkan Tree secara Post-Order\n");
+		        printf("==============================================\n");
+				deret_postorder(root);
+				getch();
+				system("cls");
+                break;
+
+            case 'q':
+            case 'Q':
+                exit = true;
+                break;
+
+            default:
+                aksiNotFound();
+                break;
+        }
+   	}
+   	system("cls");
 }
